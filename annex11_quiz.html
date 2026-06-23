@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annex 11 (개정판) Quiz · Computerised Systems</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<!-- EmailJS for sending result emails -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<!-- SheetJS for XLSX export -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root {
+  --navy:#0D1F3C; --navy2:#16325C; --blue:#1A5CBA; --blue2:#2270D8;
+  --accent:#00C2CB; --accent2:#00A8B0;
+  --success:#00B67A; --danger:#E53E3E;
+  --white:#FFFFFF; --off:#F4F7FB; --gray:#8899AA; --gray2:#C8D4E0;
+  --card:#FFFFFF; --border:rgba(26,92,186,0.13);
+  --shadow:0 4px 28px rgba(13,31,60,0.10);
+  --shadow2:0 2px 8px rgba(13,31,60,0.07);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR','Inter',sans-serif;background:var(--off);color:var(--navy);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+/* TOP BAR */
+.topbar{width:100%;background:var(--navy);display:flex;align-items:center;padding:10px 20px;position:sticky;top:0;z-index:50;gap:8px;border-bottom:2px solid var(--blue);}
+.topbar-logo{font-family:'Inter',sans-serif;font-size:13px;font-weight:800;color:var(--white);letter-spacing:2px;margin-right:auto;display:flex;align-items:center;gap:8px;}
+.topbar-logo span{background:var(--accent);color:var(--navy);border-radius:4px;padding:2px 7px;font-size:11px;font-weight:800;letter-spacing:1px;}
+.hall-btn{padding:6px 14px;border-radius:6px;border:1.5px solid rgba(0,194,203,0.4);background:transparent;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:700;color:var(--accent);cursor:pointer;letter-spacing:1px;transition:all 0.2s;margin-right:8px;}
+.hall-btn:hover{background:var(--accent);color:var(--navy);}
+.lang-btn{padding:6px 13px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.2);background:transparent;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
+.lang-btn.active{background:var(--blue2);border-color:var(--blue2);color:var(--white);}
+.lang-btn:hover:not(.active){border-color:rgba(255,255,255,0.5);color:var(--white);}
+
+/* CONTAINER */
+.container{width:100%;max-width:680px;padding:28px 20px 60px;}
+
+/* SCREEN */
+.screen{display:none;animation:fadeUp 0.4s ease;}
+.screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+/* CARD */
+.card{background:var(--card);border-radius:16px;padding:36px 32px;box-shadow:var(--shadow);border:1px solid var(--border);}
+
+/* ── START SCREEN ── */
+.start-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(26,92,186,0.08);border:1px solid rgba(26,92,186,0.2);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;}
+.start-title{font-family:'Inter',sans-serif;font-size:26px;font-weight:800;color:var(--navy);line-height:1.25;margin-bottom:6px;}
+.start-title em{color:var(--blue2);font-style:normal;}
+.start-sub{font-size:13px;color:var(--gray);letter-spacing:1px;margin-bottom:24px;font-weight:400;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:28px;}
+.info-box{background:var(--off);border-radius:10px;padding:14px 12px;text-align:center;border:1px solid var(--border);}
+.info-box .val{font-family:'Inter',sans-serif;font-size:20px;font-weight:800;color:var(--blue2);}
+.info-box .lbl{font-size:10px;color:var(--gray);letter-spacing:1px;margin-top:3px;text-transform:uppercase;}
+.divider{height:1px;background:var(--border);margin:24px 0;}
+.field-label{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--blue);margin-bottom:8px;text-transform:uppercase;}
+.name-input{width:100%;padding:13px 16px;border:1.5px solid var(--gray2);border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:15px;color:var(--navy);background:var(--white);outline:none;margin-bottom:20px;transition:border-color 0.2s;}
+.name-input:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(26,92,186,0.10);}
+.name-input::placeholder{color:var(--gray2);}
+.count-label{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--blue);margin-bottom:12px;text-transform:uppercase;text-align:center;}
+.count-buttons{display:flex;gap:10px;justify-content:center;margin-bottom:24px;}
+.count-btn{flex:1;max-width:110px;padding:14px 8px;border:1.5px solid var(--gray2);background:var(--white);border-radius:10px;font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:var(--gray);cursor:pointer;transition:all 0.2s;text-align:center;}
+.count-btn span{display:block;font-family:'Noto Sans KR',sans-serif;font-size:10px;font-weight:500;color:var(--gray);margin-top:2px;letter-spacing:1px;}
+.count-btn:hover,.count-btn.selected{border-color:var(--blue2);background:rgba(26,92,186,0.06);color:var(--blue2);transform:translateY(-2px);box-shadow:0 4px 14px rgba(26,92,186,0.12);}
+.count-btn.selected span{color:var(--blue2);}
+.start-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:var(--white);border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.25s;box-shadow:0 4px 18px rgba(26,92,186,0.30);}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(26,92,186,0.38);}
+.start-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none;}
+.footer-note{text-align:center;font-size:11px;color:var(--gray);opacity:0.6;margin-top:20px;letter-spacing:1px;}
+
+/* ── QUIZ SCREEN ── */
+.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.quiz-progress-text{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:var(--blue);}
+.quiz-score-text{font-size:12px;color:var(--gray);font-weight:500;}
+.progress-bar{width:100%;height:5px;background:var(--gray2);border-radius:3px;margin-bottom:24px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--accent));border-radius:3px;transition:width 0.5s ease;}
+
+/* Q type badges */
+.type-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:2px;padding:4px 12px;border-radius:20px;margin-bottom:12px;text-transform:uppercase;}
+.type-badge.ox{background:rgba(0,194,203,0.10);color:var(--accent2);border:1px solid rgba(0,194,203,0.25);}
+.type-badge.mc{background:rgba(26,92,186,0.08);color:var(--blue2);border:1px solid rgba(26,92,186,0.2);}
+
+.question-text{font-size:17px;font-weight:700;color:var(--navy);line-height:1.55;margin-bottom:22px;}
+
+/* OX options */
+.ox-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.ox-btn{padding:22px 10px;border:2px solid var(--gray2);background:var(--white);border-radius:12px;font-family:'Inter',sans-serif;font-size:28px;font-weight:800;color:var(--gray);cursor:pointer;transition:all 0.2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.ox-btn span{font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;}
+.ox-btn:hover:not(:disabled){border-color:var(--blue2);background:rgba(26,92,186,0.04);transform:translateY(-2px);}
+.ox-btn.selected{border-color:var(--blue2);background:rgba(26,92,186,0.07);color:var(--blue2);}
+.ox-btn.correct{border-color:var(--success);background:rgba(0,182,122,0.08);color:var(--success);}
+.ox-btn.wrong{border-color:var(--danger);background:rgba(229,62,62,0.07);color:var(--danger);}
+.ox-btn:disabled{cursor:default;}
+
+/* MC options */
+.mc-grid{display:grid;grid-template-columns:1fr;gap:9px;margin-bottom:16px;}
+.mc-btn{padding:14px 16px;border:1.5px solid var(--gray2);background:var(--white);border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;color:var(--navy);cursor:pointer;transition:all 0.2s;text-align:left;line-height:1.4;display:flex;align-items:center;gap:12px;}
+.mc-btn-num{width:26px;height:26px;border-radius:50%;background:var(--off);border:1.5px solid var(--gray2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gray);flex-shrink:0;transition:all 0.2s;}
+.mc-btn:hover:not(:disabled){border-color:var(--blue2);background:rgba(26,92,186,0.04);}
+.mc-btn:hover:not(:disabled) .mc-btn-num{background:var(--blue2);border-color:var(--blue2);color:var(--white);}
+.mc-btn.selected{border-color:var(--blue2);background:rgba(26,92,186,0.06);}
+.mc-btn.selected .mc-btn-num{background:var(--blue2);border-color:var(--blue2);color:var(--white);}
+.mc-btn.correct{border-color:var(--success);background:rgba(0,182,122,0.07);}
+.mc-btn.correct .mc-btn-num{background:var(--success);border-color:var(--success);color:var(--white);}
+.mc-btn.wrong{border-color:var(--danger);background:rgba(229,62,62,0.06);}
+.mc-btn.wrong .mc-btn-num{background:var(--danger);border-color:var(--danger);color:var(--white);}
+.mc-btn:disabled{cursor:default;}
+
+.check-btn{width:100%;padding:14px;background:var(--navy);color:var(--white);border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.2s;margin-bottom:12px;}
+.check-btn:hover:not(:disabled){background:var(--navy2);transform:translateY(-1px);}
+.check-btn:disabled{opacity:0.3;cursor:not-allowed;transform:none;}
+
+.feedback-box{display:none;border-radius:12px;padding:16px 18px;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.feedback-box.correct-fb{background:rgba(0,182,122,0.08);border:1.5px solid rgba(0,182,122,0.25);}
+.feedback-box.wrong-fb{background:rgba(229,62,62,0.06);border:1.5px solid rgba(229,62,62,0.2);}
+.feedback-result{font-size:14px;font-weight:700;margin-bottom:7px;}
+.correct-fb .feedback-result{color:var(--success);}
+.wrong-fb .feedback-result{color:var(--danger);}
+.feedback-explanation{font-size:12px;color:var(--navy);line-height:1.75;opacity:0.8;}
+.next-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:var(--white);border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px;margin-top:12px;display:none;transition:all 0.2s;box-shadow:0 4px 14px rgba(26,92,186,0.25);}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(26,92,186,0.35);}
+
+/* ── RESULT SCREEN ── */
+.result-header{text-align:center;margin-bottom:24px;}
+.result-emoji{font-size:48px;margin-bottom:10px;}
+.result-title{font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.result-sub{font-size:12px;color:var(--gray);letter-spacing:2px;}
+.score-ring-wrap{display:flex;justify-content:center;margin:20px 0 24px;}
+.score-ring{width:130px;height:130px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--accent));display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(26,92,186,0.30);}
+.score-num{font-family:'Inter',sans-serif;font-size:38px;font-weight:800;color:var(--white);line-height:1;}
+.score-denom{font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.stat-box{background:var(--off);border-radius:10px;padding:14px;text-align:center;border:1px solid var(--border);}
+.stat-val{font-family:'Inter',sans-serif;font-size:24px;font-weight:800;color:var(--blue2);}
+.stat-lbl{font-size:10px;color:var(--gray);letter-spacing:1px;margin-top:3px;text-transform:uppercase;}
+.result-msg{text-align:center;font-size:13px;line-height:1.8;color:var(--navy);opacity:0.7;margin-bottom:20px;font-style:italic;}
+.section-title{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--blue);margin-bottom:10px;text-align:center;text-transform:uppercase;}
+.top10-list{margin-bottom:20px;}
+.rank-row{display:flex;align-items:center;padding:9px 12px;border-radius:8px;margin-bottom:5px;background:var(--off);border:1px solid var(--border);}
+.rank-row.me{background:rgba(26,92,186,0.07);border-color:rgba(26,92,186,0.2);}
+.rank-num{font-family:'Inter',sans-serif;font-size:14px;font-weight:700;width:30px;color:var(--gray);}
+.rank-num.gold{color:#D4A017;} .rank-num.silver{color:#8899AA;} .rank-num.bronze{color:#A0522D;}
+.rank-name{flex:1;font-size:13px;color:var(--navy);}
+.rank-score{font-size:13px;font-weight:700;color:var(--blue2);}
+.retry-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:var(--white);border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.25s;box-shadow:0 4px 18px rgba(26,92,186,0.28);}
+.retry-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(26,92,186,0.38);}
+
+/* ── HALL OF FAME ── */
+.hof-title-wrap{text-align:center;margin-bottom:24px;}
+.hof-icon{font-size:36px;margin-bottom:8px;}
+.hof-title{font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.hof-sub{font-size:11px;color:var(--gray);letter-spacing:2px;text-transform:uppercase;}
+.hof-table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+.hof-table th{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--blue);text-align:left;padding:9px 12px;border-bottom:2px solid rgba(26,92,186,0.15);text-transform:uppercase;}
+.hof-table th:last-child{text-align:right;}
+.hof-table td{padding:11px 12px;font-size:13px;color:var(--navy);border-bottom:1px solid var(--border);}
+.hof-table td:last-child{text-align:right;font-weight:700;color:var(--blue2);}
+.hof-table tr:hover td{background:rgba(26,92,186,0.03);}
+.hof-rank-cell{font-family:'Inter',sans-serif;font-size:15px;font-weight:700;width:40px;}
+.hof-back-btn{width:100%;padding:14px;background:var(--navy);color:var(--white);border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.2s;margin-bottom:10px;}
+.hof-back-btn:hover{background:var(--navy2);transform:translateY(-1px);}
+.hof-restart-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:var(--white);border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.2s;box-shadow:0 4px 14px rgba(26,92,186,0.25);}
+.hof-restart-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(26,92,186,0.35);}
+.download-btn{width:100%;padding:13px;background:var(--white);color:var(--accent2);border:1.5px solid var(--accent2);border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.2s;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.download-btn:hover{background:var(--accent2);color:var(--white);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,168,176,0.25);}
+.download-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.email-status{font-size:11px;color:var(--gray);text-align:center;margin-top:8px;letter-spacing:0.5px;}
+.email-status.success{color:var(--success);}
+.email-status.error{color:var(--danger);}
+.hof-loading{text-align:center;padding:36px;font-size:28px;animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
+.hof-empty{text-align:center;padding:36px;color:var(--gray);font-size:13px;line-height:1.8;}
+
+/* SAVING */
+.saving-overlay{display:none;position:fixed;inset:0;background:rgba(13,31,60,0.55);z-index:100;align-items:center;justify-content:center;}
+.saving-overlay.show{display:flex;}
+.saving-box{background:var(--white);border-radius:16px;padding:28px 36px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.2);}
+.saving-spin{font-size:32px;animation:spin 1s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.saving-box p{font-size:14px;font-weight:700;color:var(--navy);margin-top:10px;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <span>GMP</span> QUIZ
+  </div>
+  <button class="hall-btn" id="hall-btn" onclick="showHallOfFame()">🏆 명예의 전당</button>
+  <button class="lang-btn active" id="btn-ko" onclick="setLang('ko')">한국어</button>
+  <button class="lang-btn" id="btn-en" onclick="setLang('en')">English</button>
+</div>
+
+<div class="container">
+
+  <!-- START -->
+  <div class="screen active" id="screen-start">
+    <div class="card">
+      <div class="start-badge" id="start-badge">📋 GMP Annex 11 Quiz</div>
+      <h1 class="start-title" id="start-title">Annex 11 (개정판)<br><em>Computerised Systems</em></h1>
+      <p class="start-sub" id="start-sub">PIC/S GMP Annex 11 · CSV · Data Integrity · 17 Sections</p>
+      <div class="info-grid">
+        <div class="info-box"><div class="val">30</div><div class="lbl" id="lbl-q">문제</div></div>
+        <div class="info-box"><div class="val">O/X</div><div class="lbl" id="lbl-ox">+ 객관식</div></div>
+        <div class="info-box"><div class="val">FDA</div><div class="lbl" id="lbl-fda">실사 기반</div></div>
+      </div>
+      <div class="divider"></div>
+      <p class="field-label" id="label-name">참여자 이름</p>
+      <input class="name-input" id="name-input" type="text" placeholder="이름을 입력하세요" oninput="onNameInput()">
+      <button class="start-btn" id="start-btn" onclick="startQuiz()" disabled id="start-btn">퀴즈 시작하기 →</button>
+    </div>
+    <p class="footer-note" id="footer-note">본 퀴즈는 PIC/S Annex 11 (개정판) 학습 목적으로 제작되었습니다</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="screen-quiz">
+    <div class="card">
+      <div class="quiz-header">
+        <span class="quiz-progress-text" id="progress-text">1 / 10</span>
+        <span class="quiz-score-text" id="score-text">점수: 0</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <span class="type-badge" id="type-badge"></span>
+      <p class="question-text" id="question-text"></p>
+      <div id="options-area"></div>
+      <button class="check-btn" id="check-btn" onclick="checkAnswer()" disabled>정답 확인</button>
+      <div class="feedback-box" id="feedback-box">
+        <p class="feedback-result" id="feedback-result"></p>
+        <p class="feedback-explanation" id="feedback-explanation"></p>
+      </div>
+      <button class="next-btn" id="next-btn" onclick="nextQuestion()">다음 문제 →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="screen-result">
+    <div class="card">
+      <div class="result-header">
+        <div class="result-emoji" id="result-emoji">🏆</div>
+        <div class="result-title" id="result-title">퀴즈 완료!</div>
+        <div class="result-sub">QUIZ COMPLETE</div>
+      </div>
+      <div class="score-ring-wrap">
+        <div class="score-ring">
+          <div class="score-num" id="final-score">0</div>
+          <div class="score-denom" id="final-total">/ 30 pts</div>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-val" id="stat-correct">0</div><div class="stat-lbl" id="lbl-correct">정답</div></div>
+        <div class="stat-box"><div class="stat-val" id="stat-wrong">0</div><div class="stat-lbl" id="lbl-wrong">오답</div></div>
+      </div>
+      <p class="result-msg" id="result-msg"></p>
+      <p class="section-title" id="top10-title">🏅 TOP 10 랭킹</p>
+      <div class="top10-list" id="top10-list"><div class="hof-loading">⏳</div></div>
+      <button class="retry-btn" id="retry-btn" onclick="resetQuiz()">다시 도전하기 →</button>
+      <button class="download-btn" id="result-download-btn" onclick="downloadXlsx()" style="margin-top:10px;">📥 <span id="download-btn-label">전체 결과 엑셀 다운로드</span></button>
+      <p class="email-status" id="email-status"></p>
+    </div>
+  </div>
+
+  <!-- HALL OF FAME -->
+  <div class="screen" id="screen-hof">
+    <div class="card">
+      <div class="hof-title-wrap">
+        <div class="hof-icon">🏆</div>
+        <div class="hof-title" id="hof-title">명예의 전당</div>
+        <div class="hof-sub" id="hof-sub">TOP 20 RANKING</div>
+      </div>
+      <div id="hof-content"><div class="hof-loading">⏳</div></div>
+      <button class="hof-back-btn" id="hof-back-btn" onclick="goBack()">← 돌아가기</button>
+      <button class="hof-restart-btn" id="hof-restart-btn" onclick="resetQuiz()">처음으로 →</button>
+      <button class="download-btn" id="hof-download-btn" onclick="downloadXlsx()" style="margin-top:10px;">📥 <span id="hof-download-btn-label">전체 결과 엑셀 다운로드</span></button>
+    </div>
+  </div>
+
+</div>
+
+<div class="saving-overlay" id="saving-overlay">
+  <div class="saving-box">
+    <div class="saving-spin">⚙️</div>
+    <p id="saving-text">점수 저장 중...</p>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyAJFodCtd0nZ9R3FIjKN0FSsBvFZkYVcqo",
+  authDomain:"cat-quiz-ece53.firebaseapp.com",
+  projectId:"cat-quiz-ece53",
+  storageBucket:"cat-quiz-ece53.firebasestorage.app",
+  messagingSenderId:"306933977395",
+  appId:"1:306933977395:web:bd9d55fc46d0091d95ae46"
+});
+const db = getFirestore(app);
+
+// ── QUIZ DATA (50문제 Pool — 30문제 랜덤 추출) ────────────────────
+// PIC/S Annex 11 (개정판) 17개 섹션 전체 커버
+// type: 'ox' | 'mc' / answer: 'O'|'X' for ox, 0-indexed for mc
+const QUESTIONS = [
+  // ─────────────────────────────────────────────────────
+  // [§2] Principles
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'전산화 시스템은 사용 전에 검증(Validation)되어야 하며, 라이프사이클 전반에 걸쳐 검증된 상태(Validated State)로 유지되어야 한다.',
+    qen:'Computerised systems should be validated before use and maintained in a validated state throughout their lifecycle.',
+    answer:'O',
+    exko:'Annex 11 §2.1 라이프사이클 관리 원칙입니다. 단순히 초기 검증만이 아니라 시스템 운영 종료까지 검증 상태 유지가 핵심입니다.',
+    exen:'Annex 11 §2.1 Lifecycle Management. Not just initial validation, but maintaining the validated state until system retirement is core.'
+  },
+  {
+    type:'ox',
+    qko:'Annex 11에 정의된 활동에 대한 대안 방법(Alternative Practices)이 동등하거나 더 높은 수준의 통제를 제공한다고 입증·문서화되면 사용 가능하다.',
+    qen:'Alternative practices to those required in Annex 11 may be used, if proven and documented to provide the same or higher level of control.',
+    answer:'O',
+    exko:'§2.3 Alternative Practices. Annex 11은 결과 중심의 가이드라인이며, 동등 수준의 통제가 입증되면 다른 방법도 인정합니다.',
+    exen:'§2.3 Alternative Practices. Annex 11 is outcome-based; alternative methods are accepted if equivalent control is proven.'
+  },
+  {
+    type:'ox',
+    qko:'전산화 시스템이 다른 시스템이나 수동 작업을 대체할 경우, 결과적으로 제품 품질·환자 안전·데이터 무결성에 대한 전체 위험이 감소해서는 안 된다.',
+    qen:'Where a computerised system replaces another system or manual operation, there should be no resultant decrease in product quality, patient safety, or data integrity.',
+    answer:'X',
+    exko:'§2.8은 위험이 "증가"해서는 안 된다고 명시합니다. 품질 저하나 위험 증가가 있어서는 안 된다는 것이 핵심 원칙입니다.',
+    exen:'§2.8 states there should be no "increase" in risk. The core principle is no degradation in quality or increase in risk.'
+  },
+  {
+    type:'ox',
+    qko:'외주(Outsourced) 활동에서도 규제 대상 사용자(Regulated User)는 Annex 11 요구사항 준수에 대한 전적인 책임을 진다.',
+    qen:'For outsourced activities, the regulated user remains fully responsible for adherence to Annex 11 requirements.',
+    answer:'O',
+    exko:'§2.6 책임은 외주가 불가능합니다. 공급업체, 클라우드 서비스, 내부 IT 부서 등 누구에게 맡기든 최종 책임은 규제 대상 사용자에게 있습니다.',
+    exen:'§2.6 Responsibility cannot be outsourced. Whether to vendors, cloud services, or internal IT, ultimate responsibility lies with the regulated user.'
+  },
+  {
+    type:'mc',
+    qko:'Annex 11 §2 Principles에서 정의한 8가지 기본 원칙에 포함되지 않는 것은?',
+    qen:'Which is NOT among the 8 fundamental principles defined in Annex 11 §2?',
+    options_ko:['라이프사이클 관리 (Lifecycle Management)','품질 위험 관리 (QRM)','데이터 무결성 (Data Integrity)','이익 극대화 (Profit Maximization)'],
+    options_en:['Lifecycle Management','Quality Risk Management','Data Integrity','Profit Maximization'],
+    answer:3,
+    exko:'§2의 8가지 원칙: Lifecycle Management, QRM, Alternative Practices, Data Integrity, System Requirements, Outsourced Activities, Security, No Risk Increase. 이익 극대화는 GMP 원칙이 아닙니다.',
+    exen:'§2 8 principles: Lifecycle Management, QRM, Alternative Practices, Data Integrity, System Requirements, Outsourced Activities, Security, No Risk Increase. Profit maximization is not a GMP principle.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§3] Pharmaceutical Quality System
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'전산화 시스템 검증 또는 운영 중 발생한 모든 일탈은 기록되어야 하며, 중대한 일탈은 근본 원인 파악과 영향 평가를 위해 조사되어야 한다.',
+    qen:'All deviations during validation or operation must be recorded, and significant deviations must be investigated for root cause and impact assessment.',
+    answer:'O',
+    exko:'§3.1.i 모든 일탈 기록과 중대 일탈 조사는 PQS의 핵심 요구사항입니다. CAPA 수립과 효과성 검증도 함께 필요합니다.',
+    exen:'§3.1.i Recording all deviations and investigating significant ones is core to PQS. CAPA establishment and effectiveness verification are also required.'
+  },
+  {
+    type:'ox',
+    qko:'경영진(Senior Management)은 시스템 라이프사이클 전반에 걸쳐 통제 상태를 효과적으로 감독하고 자원을 배분할 책임이 있다.',
+    qen:'Senior management has the responsibility to effectively oversee the state of control throughout the system lifecycle and allocate resources.',
+    answer:'O',
+    exko:'§3.1.v 경영진은 데이터 무결성, 보안, 일탈의 적시·효과적 처리 문화를 조성할 책임이 있습니다. 이는 단순한 기술적 문제가 아닌 조직 문화의 문제입니다.',
+    exen:'§3.1.v Senior management is responsible for cultivating a culture of data integrity, security, and timely/effective deviation handling. This is an organizational culture issue.'
+  },
+  {
+    type:'mc',
+    qko:'§3 PQS에서 요구하는 사항이 아닌 것은?',
+    qen:'Which is NOT a requirement of §3 PQS?',
+    options_ko:['모든 일탈 기록 및 중대 일탈 조사','변경 시 통제된 방식과 정의된 절차 준수','내부 감사 계획·실행·보고','시스템 가격의 시장 비교 분석'],
+    options_en:['Record all deviations, investigate significant ones','Changes via controlled manner and defined procedures','Plan, conduct, and report internal audits','Market price comparison of systems'],
+    answer:3,
+    exko:'PQS의 5가지 요구사항: 일탈 관리, 변경 관리, 내부 감사, 경영 검토, 경영진 감독. 시스템 가격 비교는 PQS 요구사항이 아닙니다.',
+    exen:'5 PQS requirements: deviation management, change management, internal audit, management review, senior oversight. Price comparison is not a PQS requirement.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§4] Risk Management
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'품질 위험 관리(QRM)는 전산화 시스템의 특정 단계에만 적용되며, 전체 라이프사이클에 적용할 필요는 없다.',
+    qen:'Quality Risk Management (QRM) applies only to specific stages of a computerised system, not the entire lifecycle.',
+    answer:'X',
+    exko:'§4.1 QRM은 전산화 시스템의 라이프사이클 전반에 걸쳐 적용되어야 합니다. 도입, 운영, 변경, 폐기 등 모든 단계에서 위험 평가가 필요합니다.',
+    exen:'§4.1 QRM must be applied throughout the lifecycle of a computerised system. Risk assessment is needed at all stages — implementation, operation, change, retirement.'
+  },
+  {
+    type:'ox',
+    qko:'전산화 시스템의 위험 식별·분석은 확립된 절차에 따라 수행되어야 하며, ICH Q9(R1)의 위험 관리 방법과 도구를 참조할 수 있다.',
+    qen:'Risk identification and analysis of computerised systems should follow established procedures, and ICH Q9(R1) risk management methods and tools may be referenced.',
+    answer:'O',
+    exko:'§4.2 ICH Q9(R1)은 GMP 위험 관리의 국제 표준입니다. FMEA, HACCP, FTA 등 다양한 위험 분석 도구가 활용됩니다.',
+    exen:'§4.2 ICH Q9(R1) is the international standard for GMP risk management. Various tools like FMEA, HACCP, and FTA are used.'
+  },
+  {
+    type:'mc',
+    qko:'§4 Risk Management에서 검증 전략과 노력을 결정할 때 고려해야 할 사항이 아닌 것은?',
+    qen:'Which is NOT a factor when determining validation strategy and effort under §4 Risk Management?',
+    options_ko:['시스템의 의도된 사용 (Intended Use)','제품 품질·환자 안전 위험','데이터 무결성 위험','시스템 공급업체 규모'],
+    options_en:['Intended Use of the system','Risks to product quality and patient safety','Risks to data integrity','Size of system vendor'],
+    answer:3,
+    exko:'§4.3 검증 전략 결정 시 고려사항: 의도된 사용, 제품 품질·환자 안전·데이터 무결성에 대한 잠재 위험. 공급업체 규모는 위험 평가 기준이 아닙니다.',
+    exen:'§4.3 Validation strategy factors: intended use, potential risks to product quality/patient safety/data integrity. Vendor size is not a criterion.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§5] Personnel and Training
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'전산화 시스템 활동에는 프로세스 오너, 시스템 오너, 사용자, SME, QA, QP, 내부 IT, 공급업체 등 모든 관련 당사자의 긴밀한 협력이 필요하다.',
+    qen:'Computerised system activities require close cooperation among all relevant parties including process owner, system owner, users, SMEs, QA, QP, internal IT, and vendors.',
+    answer:'O',
+    exko:'§5.1 협력은 전산화 시스템 GMP 관리의 핵심입니다. 각 당사자의 책임과 권한이 명확히 정의되어야 합니다.',
+    exen:'§5.1 Cooperation is core to GMP management of computerised systems. Each party\'s responsibilities and authorities must be clearly defined.'
+  },
+  {
+    type:'ox',
+    qko:'전산화 시스템 사용자는 할당된 책임·임무·접근 권한에 상응하는 시스템 특화 교육과 자격·경험을 가져야 한다.',
+    qen:'Users of computerised systems should have adequate system-specific training and appropriate qualifications and experience corresponding to their assigned responsibilities, duties, and access privileges.',
+    answer:'O',
+    exko:'§5.2 일반 교육이 아닌 "시스템 특화" 교육이 필수입니다. 또한 책임·임무·접근 권한과 일치해야 합니다.',
+    exen:'§5.2 "System-specific" training (not generic) is required, and must align with responsibilities, duties, and access privileges.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§6] System Requirements
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'시스템 요구사항(URS)은 개발 방식(in-house, COTS, SaaS)이나 개발 프로세스(linear, iterative)에 관계없이 모든 시스템에 적용된다.',
+    qen:'System requirements (URS) apply to all systems regardless of development method (in-house, COTS, SaaS) or process (linear, iterative).',
+    answer:'O',
+    exko:'§6.1 사내 개발, 상용 제품, SaaS 모두 동일하게 URS 작성·승인이 필요합니다. Cloud나 SaaS도 예외가 아닙니다.',
+    exen:'§6.1 URS preparation and approval apply equally to in-house, COTS, and SaaS — no exceptions for cloud or SaaS.'
+  },
+  {
+    type:'ox',
+    qko:'시스템이 구매되거나 SaaS로 제공되는 경우, 공급업체가 제공한 요구사항 명세를 그대로 승인 없이 사용할 수 있다.',
+    qen:'When a system is purchased or provided as SaaS, the requirements specification provided by the vendor can be used without review or approval.',
+    answer:'X',
+    exko:'§6.3 공급업체 제공 문서라도 규제 대상 사용자가 신중히 검토·승인해야 하며, 자사 GMP 요구사항·프로세스 충족 여부를 평가해야 합니다.',
+    exen:'§6.3 Even vendor-provided documents must be carefully reviewed and approved by the regulated user, who must assess GMP/process compliance.'
+  },
+  {
+    type:'ox',
+    qko:'시스템 요구사항은 라이프사이클 전반에 걸쳐 업데이트되고 유지되어야 하며, 시스템 변경과 커스터마이징을 반영해야 한다.',
+    qen:'System requirements must be updated and maintained throughout the lifecycle to reflect changes and customisations.',
+    answer:'O',
+    exko:'§6.4 URS는 한 번 작성으로 끝이 아닙니다. 시스템이 변경될 때마다 업데이트되어야 검증 및 추적성 유지가 가능합니다.',
+    exen:'§6.4 URS is not a one-time document. It must be updated with each system change to maintain validation and traceability.'
+  },
+  {
+    type:'ox',
+    qko:'요구사항-설계 명세-검증 테스트 케이스 간의 추적성(Traceability)은 문서화되고 유지되어야 한다.',
+    qen:'Documented traceability between requirements, design specifications, and qualification/validation test cases must be established and maintained.',
+    answer:'O',
+    exko:'§6.5 추적성 매트릭스(Traceability Matrix)는 시스템 검증의 핵심 도구입니다. 각 요구사항이 어떤 테스트로 검증되었는지 추적 가능해야 합니다.',
+    exen:'§6.5 The Traceability Matrix is a key validation tool. Each requirement must be traceable to its verifying test.'
+  },
+  {
+    type:'mc',
+    qko:'§6 System Requirements에서 요구사항 명세에 포함되어야 할 항목으로 가장 거리가 먼 것은?',
+    qen:'Which is LEAST appropriate as an item in a system requirements specification under §6?',
+    options_ko:['운영, 기능, 데이터 무결성 요구사항','기술, 인터페이스, 성능 요구사항','보안, 가용성, 규제 요구사항','시스템 마케팅 캐치프레이즈'],
+    options_en:['Operational, functional, data integrity requirements','Technical, interface, performance requirements','Security, availability, regulatory requirements','System marketing slogan'],
+    answer:3,
+    exko:'§6.2 URS 포함 사항: 운영, 기능, 데이터 무결성, 기술, 인터페이스, 성능, 가용성, 보안, 규제 요구사항. 마케팅 문구는 GMP 요구사항이 아닙니다.',
+    exen:'§6.2 URS includes: operational, functional, data integrity, technical, interface, performance, availability, security, regulatory requirements. Marketing slogans are not GMP requirements.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§7] Supplier and Service Management
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'공급업체나 서비스 제공자의 시스템 자격(Qualification)에 의존하더라도, 규제 대상 사용자의 책임은 변하지 않는다.',
+    qen:'When relying on a vendor or service provider for system qualification, the regulated user\'s responsibility does not change.',
+    answer:'O',
+    exko:'§7.1 규제 대상 사용자는 위험에 기반한 전적인 책임을 집니다. 외주는 책임의 위임이 아니라 자원의 위임일 뿐입니다.',
+    exen:'§7.1 The regulated user retains full responsibility based on risk. Outsourcing delegates resources, not responsibility.'
+  },
+  {
+    type:'ox',
+    qko:'공급업체나 서비스 제공자에 의존할 경우, 위험과 시스템 중요도에 따라 감사(Audit) 또는 철저한 평가를 수행해야 한다.',
+    qen:'When relying on a vendor or service provider, audits or thorough assessments should be conducted according to risk and system criticality.',
+    answer:'O',
+    exko:'§7.2 감사는 공급업체의 절차, 문서, 결과물의 적정성을 판단하기 위한 핵심 활동이며, 활동 반복 vs 활용 결정의 근거가 됩니다.',
+    exen:'§7.2 Audits are core to assessing vendor procedures, documentation, and deliverables, deciding between repeating vs leveraging activities.'
+  },
+  {
+    type:'ox',
+    qko:'서비스 제공자나 내부 IT 부서와의 계약에는 출구 전략(Exit Strategy)이 포함되어 시스템 데이터에 대한 통제권을 유지할 수 있어야 한다.',
+    qen:'Contracts with service providers or internal IT must include an exit strategy to allow the regulated user to retain control of system data.',
+    answer:'O',
+    exko:'§7.5.viii 출구 전략은 클라우드 시대의 핵심 요구사항입니다. 서비스 종료 시에도 GMP 데이터 통제권을 유지해야 합니다.',
+    exen:'§7.5.viii Exit strategy is a core requirement in the cloud era. GMP data control must be retained even after service termination.'
+  },
+  {
+    type:'mc',
+    qko:'§7.5 계약에 포함되어야 할 항목이 아닌 것은?',
+    qen:'Which is NOT a required item in a service provider contract under §7.5?',
+    options_ko:['SLA, KPI, 응답·해결 시간','공급업체 감사 조건','규제 실사 지원','공급업체 직원 점심 메뉴'],
+    options_en:['SLAs, KPIs, response/resolution times','Conditions for supplier audits','Support during regulatory inspections','Vendor staff lunch menu'],
+    answer:3,
+    exko:'§7.5 계약 필수 항목: 활동·문서, 회사 절차·규제 요구사항, SLA·KPI, 감사 조건, 실사 지원, 이슈 해결, 품질·보안 통신, 출구 전략, 신버전 출시 협의 등 9가지.',
+    exen:'§7.5 Required contract items: activities/docs, procedures/regulations, SLA/KPI, audit conditions, inspection support, issue resolution, quality/security comms, exit strategy, release coordination — 9 total.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§8] Alarms
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'제품 품질·환자 안전·데이터 무결성에 잠재적 영향을 미치는 중요 알람(Critical Alarm)은 적절한 접근 권한을 가진 사용자만이 확인(Acknowledge)할 수 있어야 한다.',
+    qen:'Critical alarms potentially impacting product quality, patient safety, or data integrity should only be acknowledged by users with appropriate access privileges.',
+    answer:'O',
+    exko:'§8.4 중요 알람 확인은 권한이 부여된 사용자만 가능해야 하며, 확인 시 왜 확인했는지 코멘트를 추가해야 합니다.',
+    exen:'§8.4 Critical alarm acknowledgement must be by authorized users only, with comments on why the alarm was acknowledged.'
+  },
+  {
+    type:'ox',
+    qko:'모든 알람과 확인 사항(Acknowledgement)은 자동으로 알람 로그에 추가되어야 하며, GMP 활동을 수행하는 사용자가 로그를 비활성화하거나 편집할 수 있어야 한다.',
+    qen:'All alarms and acknowledgements must be automatically added to an alarm log, and GMP users should be able to deactivate or edit the logs.',
+    answer:'X',
+    exko:'§8.5 알람 로그는 GMP 사용자가 비활성화·편집할 수 "없어야" 합니다. 로그 변경은 시스템 관리자의 권한이며, 그것도 별도 통제 절차에 따라야 합니다.',
+    exen:'§8.5 Alarm logs must NOT be deactivable or editable by GMP users. Log changes are restricted to system administrators with separate controls.'
+  },
+  {
+    type:'ox',
+    qko:'알람 로그는 정기적으로 검토되어야 하며, 검토 빈도와 상세도는 제품 품질·환자 안전·데이터 무결성에 대한 위험에 기반해야 한다.',
+    qen:'Alarm logs should be subject to periodic reviews, with frequency and detail based on risks to product quality, patient safety, and data integrity.',
+    answer:'O',
+    exko:'§8.7 알람 로그 검토는 권한 있는 사용자의 적시 확인 여부와 적절한 조치 평가를 위한 핵심 활동입니다.',
+    exen:'§8.7 Alarm log reviews are core to evaluating timely acknowledgement by authorized users and appropriate action.'
+  },
+  {
+    type:'mc',
+    qko:'§8.5 알람 로그에 포함되어야 할 항목이 아닌 것은?',
+    qen:'Which is NOT a required item in the alarm log under §8.5?',
+    options_ko:['알람 이름','알람 발생 일시 및 확인 일시','사용자명 및 역할','알람 확인자의 신체 측정치'],
+    options_en:['Alarm name','Alarm occurrence and acknowledgement timestamps','Username and role','Acknowledger\'s biometric measurements'],
+    answer:3,
+    exko:'§8.5 알람 로그 필수 항목: 알람 이름, 발생/확인 일시, 사용자명·역할, 확인 사유 코멘트. 개인 측정치는 GMP 요구사항이 아닙니다.',
+    exen:'§8.5 Required log items: alarm name, occurrence/ack timestamps, username/role, acknowledgement reason comment. Personal measurements are not required.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§9] Qualification and Validation
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'테스트 케이스는 개별 요구사항이나 명세에 추적 가능해야 하며, 요구사항에 추적되지 않는 테스트 케이스는 자격·검증 요구사항을 충족하지 않는다.',
+    qen:'Test cases must be traceable to individual requirements or specifications, and test cases not referring to requirements do not meet qualification/validation requirements.',
+    answer:'O',
+    exko:'§9.5 추적성 매트릭스 없는 테스트는 무의미합니다. 모든 테스트는 어떤 요구사항을 검증하는지 명확히 연결되어야 합니다.',
+    exen:'§9.5 Tests without a traceability matrix are meaningless. Every test must clearly link to which requirement it verifies.'
+  },
+  {
+    type:'ox',
+    qko:'검증 시 테스트 초점은 핵심 기능 요구사항, GMP 준수 보장 기능, 데이터 무결성 보장 기능에 두어야 한다.',
+    qen:'Testing focus should be on key functional requirements, GMP compliance functions, and data integrity functions.',
+    answer:'O',
+    exko:'§9.6 검증 초점 영역: 접근 권한, 제품·결과 출하, 계산, audit trail, 오류 처리, 알람·경고 처리, 경계·음수 테스트, 보고서·인터페이스, 백업 복원 등.',
+    exen:'§9.6 Validation focus: access privileges, product/result release, calculations, audit trails, error handling, alarm/warning handling, boundary/negative testing, reports/interfaces, restore from backup.'
+  },
+  {
+    type:'ox',
+    qko:'자격·검증 활동은 시스템 사용 승인 및 가동 전에 성공적으로 완료되고 보고되어야 한다.',
+    qen:'Qualification and validation activities should be successfully completed and reported prior to approval and taking the system into use.',
+    answer:'O',
+    exko:'§9.8 사용 전 완료가 원칙입니다. 다만 특정 합격 기준 미충족 시 조건부 승인이 가능하나, 영향 평가가 문서화되어야 합니다.',
+    exen:'§9.8 Completion before use is the principle. Conditional approval is possible for unmet criteria, but documented impact assessment is required.'
+  },
+  {
+    type:'ox',
+    qko:'공급업체가 제공한 자격·검증 문서는 그대로 사용하면 되며, 규제 대상 사용자는 검토할 필요가 없다.',
+    qen:'Qualification/validation documents provided by a vendor can be used as-is, without review by the regulated user.',
+    answer:'X',
+    exko:'§9.9 공급업체 제공 문서라도 규제 대상 사용자가 신중히 검토·승인해야 하며, 자사 환경 적용 가능성과 GMP·회사 프로세스 부합 여부를 평가해야 합니다.',
+    exen:'§9.9 Vendor-provided docs require careful review and authorisation by the regulated user, who must assess applicability and GMP/process compliance.'
+  },
+  {
+    type:'mc',
+    qko:'§9.3 설치 및 구성 확인 시점은?',
+    qen:'When should installation and configuration verification under §9.3 occur?',
+    options_ko:['테스트 활동 시작 후','테스트 활동 종료 시점','테스트 활동 시작 전','테스트와 무관한 별도 시점'],
+    options_en:['After test activities start','At the end of test activities','Before test activities start','Separately unrelated to testing'],
+    answer:2,
+    exko:'§9.3 모든 테스트 활동 시작 전에 시스템과 구성요소의 올바른 설치·구성을 확인해야 합니다. 운영체제·플랫폼 업데이트와 보안 패치 배포도 포함됩니다.',
+    exen:'§9.3 Correct installation/configuration must be verified prior to commencing any test activity. OS/platform updates and security patches are also covered.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§10] Handling of Data
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'중요 데이터를 한 시스템에서 다른 시스템으로 일상적 업무 프로세스로 전송할 때(예: 실험실 기기 → LIMS), 가능한 한 검증된 인터페이스에 기반해야 하며 수동 전사는 피해야 한다.',
+    qen:'When critical data is transferred between systems in routine work (e.g., lab instrument → LIMS), it should be based on validated interfaces rather than manual transcription.',
+    answer:'O',
+    exko:'§10.2 수동 전사는 데이터 무결성 위험을 증가시킵니다. 가능한 한 검증된 자동 인터페이스를 사용해야 합니다.',
+    exen:'§10.2 Manual transcription increases data integrity risk. Validated automated interfaces should be used wherever possible.'
+  },
+  {
+    type:'ox',
+    qko:'데이터 마이그레이션(예: 은퇴 시스템 → 신규 시스템)은 검증된 프로세스에 기반해야 한다.',
+    qen:'Data migration (e.g., from retired to new system) should be based on a validated process.',
+    answer:'O',
+    exko:'§10.3 데이터 마이그레이션은 검증된 프로세스가 필요합니다. 송수신 양쪽의 제약을 고려해야 합니다.',
+    exen:'§10.3 Data migration requires a validated process, considering constraints on both sending and receiving sides.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§11] Identity and Access Management
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'모든 사용자는 고유하고 개인적인 계정을 가져야 하며, 데이터·설정 변경이 불가능한 Read-Only 접근으로 제한된 경우를 제외하고는 공유 계정은 데이터 무결성 위반에 해당한다.',
+    qen:'All users must have unique and personal accounts. Shared accounts, except those limited to read-only access, constitute a violation of data integrity.',
+    answer:'O',
+    exko:'§11.1 Read-Only 공유 계정은 예외적으로 허용되지만, 데이터·설정 변경이 가능한 모든 공유 계정은 ALCOA+ Attributable 위반입니다.',
+    exen:'§11.1 Read-only shared accounts are exceptionally allowed, but any shared account capable of modifying data/settings violates ALCOA+ Attributable.'
+  },
+  {
+    type:'ox',
+    qko:'중요 시스템에 대한 통제 경계 외부에서의 원격 인증은 다중 요소 인증(MFA)을 포함해야 한다.',
+    qen:'Remote authentication on critical systems from outside controlled perimeters should include multifactor authentication (MFA).',
+    answer:'O',
+    exko:'§11.6 원격 접속 시 MFA 적용은 클라우드·재택 근무 시대의 필수 보안 요구사항입니다.',
+    exen:'§11.6 MFA for remote access is essential in the cloud/remote-work era.'
+  },
+  {
+    type:'ox',
+    qko:'전산화 시스템 사용자의 접근 권한은 "직무 분리(Segregation of Duties)" 원칙과 "최소 권한(Least Privilege)" 원칙에 따라 관리되어야 한다.',
+    qen:'Access privileges should be managed according to "Segregation of Duties" and "Least Privilege" principles.',
+    answer:'O',
+    exko:'§11.10 두 원칙: ①GMP 활동 사용자는 관리자 권한을 갖지 않아야 함 ②사용자는 직무에 필요한 권한 이상을 갖지 않아야 함.',
+    exen:'§11.10 Two principles: ①GMP users shouldn\'t have admin privileges ②users shouldn\'t have higher privileges than needed for their job.'
+  },
+  {
+    type:'ox',
+    qko:'토큰이나 스마트카드만으로 인증하는 것은 다른 사용자가 사용할 수 있다면 충분하지 않다.',
+    qen:'Authentication only by means of a token or smart card is not sufficient, if this could be used by another user.',
+    answer:'O',
+    exko:'§11.3 토큰·스마트카드는 분실·도용 가능하므로 단독 인증 수단으로 부적절합니다. PIN, 비밀번호, 생체 인식과 결합해야 합니다.',
+    exen:'§11.3 Tokens/smart cards can be lost or stolen, so they are inadequate as sole authentication. They must be combined with PIN, password, or biometrics.'
+  },
+  {
+    type:'ox',
+    qko:'사용자 계정은 관리자나 시스템 관리자로부터 받은 비밀번호를 첫 로그인 시 변경할 필요가 없다.',
+    qen:'Passwords received from a manager or system administrator do not need to be changed at first login.',
+    answer:'X',
+    exko:'§11.4 비밀번호와 인증 수단은 기밀로 유지되어야 하며, 관리자에게서 받은 비밀번호는 첫 로그인 시 변경되어야 합니다. 시스템이 이를 강제할 것을 권장합니다.',
+    exen:'§11.4 Passwords/authentication must be kept confidential, and admin-issued passwords must be changed at first login, preferably system-enforced.'
+  },
+  {
+    type:'mc',
+    qko:'§11 Identity and Access Management의 두 가지 핵심 원칙은?',
+    qen:'What are the two guiding principles of §11 Identity and Access Management?',
+    options_ko:['빠른 인증과 편의성','직무 분리(Segregation of Duties)와 최소 권한(Least Privilege)','관리자 권한 강화와 일괄 처리','암호 자동 저장과 자동 로그인'],
+    options_en:['Fast authentication and convenience','Segregation of Duties and Least Privilege','Enhanced admin privileges and batch processing','Auto password save and auto login'],
+    answer:1,
+    exko:'§11.10 두 원칙: 직무 분리(GMP 사용자는 관리자 권한 없음)와 최소 권한(직무에 필요한 만큼만 권한 부여). 보안과 추적성의 핵심입니다.',
+    exen:'§11.10 Two principles: Segregation of Duties (GMP users without admin privileges) and Least Privilege (only privileges needed for the job). Core to security and traceability.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§12] Audit Trails
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'Audit Trail은 변경 시점에 자동으로 기록되어야 하며, 프로세스 종료 시 일괄 기록되어서는 안 된다.',
+    qen:'Audit trail data should be recorded at the time of events, not at the end of a process.',
+    answer:'O',
+    exko:'§12.2 Audit Trail은 사용자(Who), 변경 내용(What), 시점(When), 사유(Why)를 즉시 기록해야 합니다.',
+    exen:'§12.2 Audit trails must immediately record Who, What, When, and Why for each change.'
+  },
+  {
+    type:'ox',
+    qko:'Audit Trail 기능은 항상 활성화·잠금 상태여야 하며, 어떤 사용자도 audit trail 데이터를 편집할 수 없어야 한다.',
+    qen:'Audit trail functionality should be enabled and locked at all times, and no user should be able to edit audit trail data.',
+    answer:'O',
+    exko:'§12.3 Audit Trail 비활성화나 시스템 시간 변경은 GMP 활동에 관여하지 않는 시스템 관리자만 수행 가능하며, 이 행위 자체가 Audit Trail에 기록되어야 합니다.',
+    exen:'§12.3 Disabling audit trails or changing system time is only allowed by system admins not involved in GMP, and such acts must themselves create audit trail entries.'
+  },
+  {
+    type:'ox',
+    qko:'Audit Trail 검토는 검토 대상 활동에 직접 관여한 인원이 수행해야 한다.',
+    qen:'Audit trail reviews should be conducted by personnel directly involved in the activities under review.',
+    answer:'X',
+    exko:'§12.6 Audit Trail 검토는 검토 대상 활동에 "직접 관여하지 않은" 인원이 수행해야 합니다 (Peer Review). 자기 작업을 자기가 검토하는 것은 객관성 부족입니다.',
+    exen:'§12.6 Audit trail reviews must be conducted by personnel NOT directly involved (Peer Review). Self-review lacks objectivity.'
+  },
+  {
+    type:'ox',
+    qko:'Audit Trail 검토는 모든 항목을 일일이 검토하는 것이 가장 효과적이며, 위험 기반 접근은 불필요하다.',
+    qen:'Reviewing all audit trail entries one by one is most effective; risk-based approach is unnecessary.',
+    answer:'X',
+    exko:'§12.7 모든 항목 검토는 효과적이지 않습니다. 위험 기반으로 표적화되어, GMP 원칙 위반을 시사하는 변경에 초점을 맞춰야 합니다.',
+    exen:'§12.7 Reviewing all entries is not effective. Reviews should be targeted, risk-based, focusing on changes indicating GMP violations.'
+  },
+  {
+    type:'ox',
+    qko:'배치 출하에 직접 영향을 미치는 Audit Trail 검토는 배치 출하 시점에 QP가 이용 가능해야 한다.',
+    qen:'Audit trail reviews with direct impact on product release should be available to the QP at the time of batch release.',
+    answer:'O',
+    exko:'§12.10 배치 출하 시점에 관련 Audit Trail 검토가 완료·이용 가능해야 합니다. QP의 출하 결정은 데이터 무결성에 대한 신뢰를 전제로 합니다.',
+    exen:'§12.10 Related audit trail reviews must be completed and available at batch release time. The QP\'s release decision presumes data integrity.'
+  },
+  {
+    type:'mc',
+    qko:'§12.2에서 Audit Trail이 명확히 기록해야 할 4가지(W4) 정보가 아닌 것은?',
+    qen:'Which is NOT among the 4Ws audit trails must unambiguously capture under §12.2?',
+    options_ko:['Who (사용자)','What (변경 내용)','When (날짜·시간)','How much (비용)'],
+    options_en:['Who (user)','What (change details)','When (date/time)','How much (cost)'],
+    answer:3,
+    exko:'§12.2 Audit Trail 4W: Who, What, When, Why. 비용은 Audit Trail 요구 항목이 아닙니다.',
+    exen:'§12.2 Audit Trail 4Ws: Who, What, When, Why. Cost is not required.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§13] Electronic Signatures
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'전자 서명 실행 시 시스템은 사용자에게 시스템 로그인과 동일한 수준 이상의 보안을 제공하는 완전한 재인증을 강제해야 한다.',
+    qen:'When executing an electronic signature, the system should enforce full re-authentication at the same or higher security level as system login.',
+    answer:'O',
+    exko:'§13.3 전자 서명은 단순한 클릭이 아닙니다. PIN, 스마트카드, 이전 시스템 인증 의존만으로는 부적절하며, 비밀번호·생체 인식의 재인증이 필요합니다.',
+    exen:'§13.3 Electronic signature is not a mere click. Reliance on PIN, smart card, or previous session is inadequate; password or biometric re-authentication is required.'
+  },
+  {
+    type:'ox',
+    qko:'전자 서명은 분쟁의 여지가 없으며(Indisputable) 수기 서명과 동등해야 한다.',
+    qen:'Electronic signatures should be indisputable and equivalent to hand-written signatures.',
+    answer:'O',
+    exko:'§13.7 전자 서명은 법적 효력과 무결성에서 수기 서명과 동등해야 합니다. 부정·복제·위변조 방지가 필수입니다.',
+    exen:'§13.7 Electronic signatures must equal hand-written signatures in legal effect and integrity. Anti-fraud, anti-duplication, and anti-tampering are essential.'
+  },
+  {
+    type:'ox',
+    qko:'전자 서명은 해당 기록과 영구적으로 연결되어야 하며, 서명된 기록이 수정되거나, 수정되면 서명되지 않은 상태로 명확히 표시되어야 한다.',
+    qen:'Electronic signatures should be permanently linked to their respective records. A signed record cannot be modified, or if modified, must clearly appear as unsigned.',
+    answer:'O',
+    exko:'§13.8 끊을 수 없는 연결(Unbreakable Link)은 전자 서명 시스템 검증의 핵심 항목입니다. 변경 시 서명 무효화가 자동으로 일어나야 합니다.',
+    exen:'§13.8 Unbreakable Link is core to e-signature system validation. Modifications must automatically invalidate the signature.'
+  },
+  {
+    type:'ox',
+    qko:'수기(Wet-Ink) 서명으로 전자 기록을 서명하는 하이브리드 솔루션을 사용하는 경우, 전자 기록의 변경이 서명을 무효화하도록 측정 수단(예: 해시 코드)이 구현되어야 한다.',
+    qen:'For hybrid solutions where wet-ink signatures sign electronic records, measures (e.g., hash code) should be implemented to invalidate the signature on any change.',
+    answer:'O',
+    exko:'§13.9 하이브리드 솔루션의 위험은 전자 기록의 사후 변경입니다. 체크섬(Hash)을 서명 페이지에 인쇄하면 무결성 검증이 가능합니다.',
+    exen:'§13.9 The risk in hybrid solutions is post-signature modification. Printing a checksum (hash) on the signature page enables integrity verification.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§14] Periodic Review
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'정기 검토(Periodic Review)는 시스템이 "의도된 용도에 적합(Fit for Intended Use)"한지, "검증 상태(Validated State)"에 있는지 확인하기 위해 수행된다.',
+    qen:'Periodic reviews verify whether the system remains \'fit for intended use\' and in \'a validated state\'.',
+    answer:'O',
+    exko:'§14.1 정기 검토는 시스템의 상태를 평가하고 재검증 필요성을 판단하는 활동입니다. 단순 형식적 절차가 아닙니다.',
+    exen:'§14.1 Periodic reviews evaluate system status and determine re-validation needs — not a mere formality.'
+  },
+  {
+    type:'ox',
+    qko:'정기 검토의 빈도는 시스템이 제품 품질·환자 안전·데이터 무결성에 미치는 위험에 기반하여 정당화되어야 한다.',
+    qen:'The frequency of periodic reviews should be established and justified based on the risk to product quality, patient safety, and data integrity.',
+    answer:'O',
+    exko:'§14.3 단일한 검토 주기는 없습니다. 시스템마다 위험에 기반한 검토 주기 설정과 정당화가 필요하며, 시스템 폐기 시 최종 검토도 필요합니다.',
+    exen:'§14.3 No single review interval fits all. Each system needs a risk-based interval with justification, plus a final review when retired.'
+  },
+  {
+    type:'mc',
+    qko:'§14.2 정기 검토 범위에 포함되지 않는 것은?',
+    qen:'Which is NOT in the scope of §14.2 Periodic Review?',
+    options_ko:['하드웨어·소프트웨어 변경 사항','이전 검토·감사·실사 후 후속 조치','Audit Trail·접근 검토 결과','직원 가족 구성원 변경'],
+    options_en:['Hardware/software changes','Follow-up from prior reviews/audits/inspections','Audit trail/access review results','Employee family changes'],
+    answer:3,
+    exko:'§14.2 검토 범위: 하드웨어·소프트웨어 변경, 시스템 문서 변경, 다중 변경의 결합 효과, 이전 후속 조치, Audit Trail·접근 검토, 사고·문제·일탈, 유지보수·교정, 계약·KPI, 백업·복원, 보관·아카이브, 데이터 무결성 평가, 규제 변경 등 12가지. 가족 변경은 무관합니다.',
+    exen:'§14.2 Scope: HW/SW changes, doc changes, combined effects, follow-ups, audit/access reviews, incidents/deviations, maintenance/calibration, contracts/KPI, backup/restore, archival, DI assessments, regulatory changes — 12 items. Family changes are irrelevant.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§15] Security
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'규제 대상 사용자는 인터넷을 직면하는 중요 시스템에 대해 정기적으로 침투 테스트(Penetration Testing / Ethical Hacking)를 수행해야 한다.',
+    qen:'For critical systems facing the internet, penetration testing (ethical hacking) should be performed at regular intervals.',
+    answer:'O',
+    exko:'§15.19 침투 테스트는 보안 조치의 적정성을 평가하고 취약점을 식별하기 위한 핵심 활동입니다. 발견된 취약점, 특히 데이터 무결성 손실 가능성은 적시에 조치되어야 합니다.',
+    exen:'§15.19 Penetration testing assesses security adequacy and identifies vulnerabilities. Identified vulnerabilities, especially those affecting data integrity, must be timely addressed.'
+  },
+  {
+    type:'ox',
+    qko:'더 이상 공급업체 지원을 받지 못하는 운영체제·플랫폼의 응용 프로그램은 컴퓨터 네트워크와 인터넷에서 격리되어야 한다.',
+    qen:'Applications on operating systems and platforms no longer supported by vendors should be isolated from computer networks and the internet.',
+    answer:'O',
+    exko:'§15.12 비지원 플랫폼은 보안 패치를 받지 못해 매우 취약합니다. 데이터 무결성을 위해 네트워크에서 격리하는 것이 필수입니다.',
+    exen:'§15.12 Unsupported platforms cannot receive security patches and are highly vulnerable. Network isolation is essential for data integrity.'
+  },
+  {
+    type:'ox',
+    qko:'USB 같은 양방향 장치는 GMP 활동에 사용되는 서버·컴퓨터에서 자유롭게 사용 가능하며, 별도의 통제 절차가 필요 없다.',
+    qen:'Bidirectional devices like USB can be freely used in servers/computers used in GMP activities, without separate controls.',
+    answer:'X',
+    exko:'§15.15 USB 같은 양방향 장치는 엄격히 통제되어야 합니다. 회사 외부에서 사용된 적이 있다면 효과적인 스캔 후 안전성 확인 없이 사용할 수 없습니다(§15.16).',
+    exen:'§15.15 Bidirectional devices like USB must be strictly controlled. If used externally, they cannot be used without effective scanning and safety verification (§15.16).'
+  },
+  {
+    type:'ox',
+    qko:'데이터 센터는 자연재해와 인공재해(폭풍, 홍수, 지진, 화재, 정전, 네트워크 장애 등)의 위험과 영향을 최소화하도록 구축되어야 한다.',
+    qen:'Data centres should be constructed to minimise the risk and impact of natural and manmade disasters (storms, flooding, earthquakes, fires, power outages, network failures).',
+    answer:'O',
+    exko:'§15.5 데이터 센터 보안에는 물리적 보호와 재해 방지가 모두 포함됩니다. 또한 §15.6 복제(Replication)와 §15.7 재해 복구 계획이 필요합니다.',
+    exen:'§15.5 Data centre security includes both physical protection and disaster prevention. §15.6 Replication and §15.7 Disaster Recovery Plan are also required.'
+  },
+  {
+    type:'ox',
+    qko:'중요 보안 패치는 공급업체 권장사항에 따라 적시에 배포되어야 하며, 중요 취약점의 경우 즉시 배포해야 할 수 있다.',
+    qen:'Critical security patches should be deployed in a timely manner per vendor recommendations, and for critical vulnerabilities, this might be immediately.',
+    answer:'O',
+    exko:'§15.13 적시 패치(Timely Patching)는 랜섬웨어 등 권한 상승 공격을 막는 핵심 보안 활동입니다. 중요 취약점은 발견 즉시 패치해야 합니다.',
+    exen:'§15.13 Timely patching is core to preventing ransomware and privilege-escalation attacks. Critical vulnerabilities require immediate patching.'
+  },
+  {
+    type:'mc',
+    qko:'§15 Security에서 다중 요소 인증(MFA)이 필수로 요구되는 상황은?',
+    qen:'When is multi-factor authentication (MFA) required under §15 Security?',
+    options_ko:['모든 일상 작업 시','중요 시스템에 대한 통제 경계 외부 원격 인증','오프라인 작업 시','회사 내부 출퇴근 시'],
+    options_en:['All daily tasks','Remote authentication on critical systems from outside controlled perimeters','Offline work','Internal commuting'],
+    answer:1,
+    exko:'§11.6 중요 시스템에 대한 통제 경계 외부 원격 인증은 MFA 필수입니다. 또한 §15.4 서버룸·데이터센터 물리적 접근에도 MFA가 권장됩니다.',
+    exen:'§11.6 Remote authentication on critical systems from outside controlled perimeters requires MFA. §15.4 also recommends MFA for server rooms/data centres.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§16] Backup
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'백업은 원본 데이터를 보유한 서버·컴퓨터와 물리적으로 분리되어 안전한 거리에 저장되어야 한다.',
+    qen:'Backups should be physically separated from the server or computer holding the original data and stored at a safe distance.',
+    answer:'O',
+    exko:'§16.3 물리적 분리는 동일 사고(화재, 침수 등)가 원본과 백업 모두에 영향을 미치는 것을 방지합니다. §16.4 논리적 분리도 동일 네트워크 사고 방지를 위해 필요합니다.',
+    exen:'§16.3 Physical separation prevents the same incident (fire, flood) from impacting both original and backup. §16.4 Logical separation also prevents same-network incidents.'
+  },
+  {
+    type:'ox',
+    qko:'백업에서 데이터 복원은 시스템 검증 시와 백업·복원 프로세스나 도구 변경 후에 위험에 기반하여 테스트되고 문서화되어야 한다.',
+    qen:'Restore of data from backup should be tested and documented based on risk during system validation and after changes to backup/restore processes.',
+    answer:'O',
+    exko:'§16.6 복원 테스트(Restore Test)는 백업의 실효성을 입증하는 핵심 활동입니다. "백업이 있다"는 사실만으로는 충분하지 않으며, 실제 복원이 작동하는지 검증해야 합니다.',
+    exen:'§16.6 Restore tests are core to proving backup effectiveness. Merely having a backup is not enough; actual restoration must be verified.'
+  },
+  {
+    type:'mc',
+    qko:'§16 Backup에서 권장하는 백업 빈도 전략은?',
+    qen:'What is the backup frequency strategy recommended under §16?',
+    options_ko:['일주일에 한 번만','매일 한 번만','적절한 간격(예: 시간별, 일별, 주별, 월별)에 위험 기반','중요 시점에만 수동으로'],
+    options_en:['Once a week only','Once a day only','Suitable intervals (e.g., hourly, daily, weekly, monthly) based on risk','Manual at critical moments only'],
+    answer:2,
+    exko:'§16.2 백업 빈도와 보존 기간은 위험 기반으로 결정됩니다. 시간별, 일별, 주별, 월별 등 다양한 주기가 가능하며 각각 다른 보존 기간을 가집니다.',
+    exen:'§16.2 Backup frequency and retention are risk-based. Hourly, daily, weekly, monthly intervals are possible, each with different retention.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [§17] Archiving
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'프로세스 완료 후(예: 제품 출하), GMP 데이터와 메타데이터(audit trails 포함)는 보존 기간 동안 삭제 및 변경으로부터 보호되어야 한다.',
+    qen:'After completion of a process (e.g., product release), GMP data and metadata (incl. audit trails) should be protected from deletion and changes throughout the retention period.',
+    answer:'O',
+    exko:'§17.1 아카이브는 데이터를 읽기 전용(Read-Only)으로 변경하거나, 검증된 인터페이스를 통해 전용 아카이브 시스템으로 이동하는 방식으로 수행됩니다.',
+    exen:'§17.1 Archiving is done by changing status to read-only or moving to a dedicated archival system via validated interface.'
+  },
+  {
+    type:'ox',
+    qko:'GMP 데이터와 메타데이터를 한 위치에서 다른 위치로 이동할 때, 데이터 삭제 전에 데이터 무결성을 높은 수준의 확실성으로 검증해야 한다(예: 체크섬 사용).',
+    qen:'When moving GMP data/metadata between locations, the integrity should be verified with a high degree of certainty before any deletion (e.g., by checksum).',
+    answer:'O',
+    exko:'§17.2 데이터 이동 시 체크섬(Checksum) 검증은 데이터 손실·손상을 방지합니다. 자동 검증이 불가능한 경우 수동으로 완전성·무결성을 검증해야 합니다.',
+    exen:'§17.2 Checksum verification during data movement prevents loss/corruption. If automatic verification is impossible, completeness/integrity must be manually verified.'
+  },
+  {
+    type:'ox',
+    qko:'서버(디스크)에 아카이브된 데이터는 라이브 데이터와 동일한 절차로 정기적으로 백업되어야 한다.',
+    qen:'Data archived on a server (disk) should be regularly backed up following the same procedures as for live data.',
+    answer:'O',
+    exko:'§17.3 아카이브 데이터도 백업이 필요합니다. 아카이브 백업도 물리적·논리적으로 아카이브 데이터에서 분리되어야 합니다.',
+    exen:'§17.3 Archived data also requires backups, which must be physically and logically separated from archived data.'
+  },
+  {
+    type:'mc',
+    qko:'§17 Archiving에서 아카이브된 데이터의 형태로 요구되는 것은?',
+    qen:'What is required for archived data form under §17 Archiving?',
+    options_ko:['편집 가능한 형식','읽기 전용(Read-Only) 상태','암호화 필수','수동 검토 불가능한 형식'],
+    options_en:['Editable format','Read-only status','Encryption required','Format not allowing manual review'],
+    answer:1,
+    exko:'§17.1 아카이브된 데이터는 읽기 전용(Read-Only) 상태로 변경되어 삭제·변경으로부터 보호되어야 합니다. 또한 §17.5 검색·정렬이 가능한 형식이어야 합니다.',
+    exen:'§17.1 Archived data must be in read-only status, protected from deletion/changes. §17.5 also requires retrievable in searchable/sortable format.'
+  },
+
+  // ─────────────────────────────────────────────────────
+  // [Glossary] 용어 정의
+  // ─────────────────────────────────────────────────────
+  {
+    type:'ox',
+    qko:'Annex 11의 ALCOA+는 Attributable, Legible, Contemporaneous, Original, Accurate에 Complete, Consistent, Enduring, Available 4가지 속성이 추가된 개념이다.',
+    qen:'Annex 11\'s ALCOA+ adds Complete, Consistent, Enduring, and Available to the basic ALCOA principles.',
+    answer:'O',
+    exko:'Glossary 정의: ALCOA(5가지) + 4가지 추가 속성. 데이터 무결성의 국제 표준 원칙입니다.',
+    exen:'Glossary definition: ALCOA (5) + 4 additional attributes. The international standard for data integrity.'
+  },
+  {
+    type:'mc',
+    qko:'Annex 11 Glossary에서 정의한 다중 요소 인증(MFA)의 정의는?',
+    qen:'What is the definition of Multi-factor Authentication (MFA) in Annex 11 Glossary?',
+    options_ko:['비밀번호 2개 사용','3가지 요소(아는 것/가진 것/본인) 중 2가지 결합','관리자 승인 추가','생체 인식 단독 사용'],
+    options_en:['Using 2 passwords','Combining 2 of 3 factors (know/have/are)','Adding admin approval','Biometric only'],
+    answer:1,
+    exko:'MFA: something you know(비밀번호 등) + something you have(휴대폰·스마트카드) + something you are(생체 인식) 중 2가지 이상의 결합.',
+    exen:'MFA: combination of 2 of 3 factors — something you know (password), something you have (phone/card), something you are (biometric).'
+  },
+  {
+    type:'mc',
+    qko:'Annex 11 Glossary의 "Qualification" 정의에 가장 가까운 것은?',
+    qen:'Which best matches the Annex 11 Glossary definition of "Qualification"?',
+    options_ko:['시스템이 의도된 결과를 산출함을 증명하는 행위','시스템이 효과적으로 설계·설치·시운전되고 정확히 작동함을 검증하는 행위','요구사항이 충족되었는지 객관적 증거로 확인','시스템 유지보수 활동'],
+    options_en:['Proving the system produces intended results','Verifying the system is effectively designed, installed, commissioned, and operates correctly','Confirming requirements are met through objective evidence','System maintenance activities'],
+    answer:1,
+    exko:'Qualification: 시스템(하드웨어·소프트웨어 포함)이 효과적으로 설계되고 설치·시운전되며 정확히 작동함을 검증하는 행위. Validation은 더 광범위한 개념입니다.',
+    exen:'Qualification: action of verifying that the system (incl. HW/SW) is effectively designed, installed, commissioned, and operates correctly. Validation is broader.'
+  },
+  {
+    type:'mc',
+    qko:'Annex 11 Glossary의 URS(User Requirement Specifications) 정의는?',
+    qen:'What is the definition of URS (User Requirement Specifications) in Annex 11 Glossary?',
+    options_ko:['공급업체가 일방적으로 제공하는 문서','사용자가 전산화 시스템에 기대하는 기능을 서면으로 정의한 것','시스템 운영 매뉴얼','감사 보고서'],
+    options_en:['Document unilaterally provided by vendor','Written definition of what the user expects the system to do','System operations manual','Audit report'],
+    answer:1,
+    exko:'URS는 사용자가 전산화 시스템이 수행할 것으로 기대하는 기능을 서면으로 정의한 것입니다. 모든 후속 자격·검증 활동의 출발점입니다.',
+    exen:'URS defines in writing what the user expects the computerised system to do. It is the starting point for all subsequent qualification/validation activities.'
+  }
+];
+
+// ── STATE ─────────────────────────────────────────────────────────
+let lang='ko', totalCount=30, questions=[], current=0, score=0;
+let answered=false, lastAnswerOk=false, playerName='', prevScreen='screen-start';
+let hofRows=[];
+
+// ── LANG ──────────────────────────────────────────────────────────
+function t(ko,en){return lang==='ko'?ko:en;}
+
+window.setLang=function(l){
+  lang=l;
+  document.getElementById('btn-ko').classList.toggle('active',l==='ko');
+  document.getElementById('btn-en').classList.toggle('active',l==='en');
+  document.getElementById('hall-btn').textContent=t('🏆 명예의 전당','🏆 Hall of Fame');
+  // start
+  document.getElementById('start-title').innerHTML=t('Annex 11 (개정판)<br><em>Computerised Systems</em>','Annex 11 (Revised)<br><em>Computerised Systems</em>');
+  document.getElementById('start-sub').textContent=t('PIC/S GMP Annex 11 · CSV · Data Integrity · 17 Sections','PIC/S GMP Annex 11 · CSV · Data Integrity · 17 Sections');
+  document.getElementById('lbl-q').textContent=t('문제','Questions');
+  document.getElementById('lbl-ox').textContent=t('O/X + 객관식','O/X + MCQ');
+  document.getElementById('lbl-fda').textContent=t('실사 기반','FDA Based');
+  document.getElementById('label-name').textContent=t('참여자 이름','Your Name');
+  document.getElementById('name-input').placeholder=t('이름을 입력하세요','Enter your name');
+  document.getElementById('start-btn').textContent=t('퀴즈 시작하기 →','Start Quiz →');
+  document.getElementById('footer-note').textContent=t('본 퀴즈는 PIC/S Annex 11 (개정판) 학습 목적으로 제작되었습니다','This quiz is for studying the PIC/S Annex 11 (Revised) guideline');
+  // result
+  document.getElementById('lbl-correct').textContent=t('정답','Correct');
+  document.getElementById('lbl-wrong').textContent=t('오답','Wrong');
+  document.getElementById('top10-title').textContent=t('🏅 TOP 10 랭킹','🏅 TOP 10 RANKING');
+  document.getElementById('retry-btn').textContent=t('다시 도전하기 →','Try Again →');
+  // hof
+  document.getElementById('hof-title').textContent=t('명예의 전당','Hall of Fame');
+  document.getElementById('hof-sub').textContent=t('TOP 20 랭킹','TOP 20 RANKING');
+  document.getElementById('hof-back-btn').textContent=t('← 돌아가기','← Go Back');
+  document.getElementById('hof-restart-btn').textContent=t('처음으로 →','Restart →');
+  document.getElementById('download-btn-label').textContent=t('전체 결과 엑셀 다운로드','Download All Results (XLSX)');
+  document.getElementById('hof-download-btn-label').textContent=t('전체 결과 엑셀 다운로드','Download All Results (XLSX)');
+  document.getElementById('saving-text').textContent=t('점수 저장 중...','Saving score...');
+
+  // 화면별 재렌더
+  if(document.getElementById('screen-quiz').classList.contains('active')&&questions.length){
+    renderQ();
+    if(answered) refreshFeedback();
+  }
+  if(document.getElementById('screen-result').classList.contains('active')&&questions.length) refreshResultLang();
+  if(document.getElementById('screen-hof').classList.contains('active')) renderHofTable();
+};
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function buildQuestions(n){
+  const pool=shuffle([...QUESTIONS]);
+  return pool.slice(0,Math.min(n,pool.length));
+}
+
+// ── START ─────────────────────────────────────────────────────────
+window.onNameInput=function(){playerName=document.getElementById('name-input').value.trim();updateStartBtn();};
+function updateStartBtn(){document.getElementById('start-btn').disabled=!playerName;}
+window.startQuiz=function(){questions=buildQuestions(totalCount);current=0;score=0;showScreen('screen-quiz');loadQ();};
+
+function showScreen(id){
+  prevScreen=document.querySelector('.screen.active')?.id||'screen-start';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── QUIZ ──────────────────────────────────────────────────────────
+function loadQ(){
+  answered=false;
+  const q=questions[current];
+  document.getElementById('progress-text').textContent=`${current+1} / ${totalCount}`;
+  document.getElementById('score-text').textContent=t(`점수: ${score}`,`Score: ${score}`);
+  document.getElementById('progress-fill').style.width=`${(current/totalCount)*100}%`;
+  document.getElementById('feedback-box').style.display='none';
+  document.getElementById('next-btn').style.display='none';
+  document.getElementById('check-btn').disabled=true;
+  renderQ();
+}
+
+function renderQ(){
+  const q=questions[current];
+  const badge=document.getElementById('type-badge');
+  badge.className=`type-badge ${q.type}`;
+  badge.textContent=q.type==='ox'?t('O / X 퀴즈','O / X Quiz'):t('📝 객관식','📝 Multiple Choice');
+  document.getElementById('question-text').textContent=lang==='ko'?q.qko:q.qen;
+  document.getElementById('check-btn').textContent=t('정답 확인','Check Answer');
+  document.getElementById('score-text').textContent=t(`점수: ${score}`,`Score: ${score}`);
+  renderOptions();
+}
+
+function renderOptions(){
+  const q=questions[current];
+  const area=document.getElementById('options-area');
+  area.innerHTML='';
+
+  if(q.type==='ox'){
+    const grid=document.createElement('div'); grid.className='ox-grid';
+    ['O','X'].forEach(val=>{
+      const btn=document.createElement('button');
+      btn.className='ox-btn'; btn.dataset.val=val;
+      btn.innerHTML=`${val}<span>${val==='O'?t('맞다','True'):t('틀리다','False')}</span>`;
+      btn.onclick=()=>selectOpt(btn);
+      grid.appendChild(btn);
+    });
+    area.appendChild(grid);
+  } else {
+    const grid=document.createElement('div'); grid.className='mc-grid';
+    const opts=lang==='ko'?q.options_ko:q.options_en;
+    opts.forEach((opt,i)=>{
+      const btn=document.createElement('button');
+      btn.className='mc-btn'; btn.dataset.index=i;
+      btn.innerHTML=`<span class="mc-btn-num">${String.fromCharCode(65+i)}</span>${opt}`;
+      btn.onclick=()=>selectOpt(btn);
+      grid.appendChild(btn);
+    });
+    area.appendChild(grid);
+  }
+}
+
+function selectOpt(clickedBtn){
+  if(answered)return;
+  document.querySelectorAll('.ox-btn,.mc-btn').forEach(b=>b.classList.remove('selected'));
+  clickedBtn.classList.add('selected');
+  document.getElementById('check-btn').disabled=false;
+}
+
+window.checkAnswer=function(){
+  if(answered)return; answered=true;
+  const q=questions[current];
+  let ok=false;
+
+  if(q.type==='ox'){
+    const sel=document.querySelector('.ox-btn.selected');
+    const chosen=sel?sel.dataset.val:'';
+    ok=chosen===q.answer;
+    document.querySelectorAll('.ox-btn').forEach(btn=>{
+      btn.disabled=true;
+      if(btn.dataset.val===q.answer) btn.classList.add('correct');
+      else if(btn.dataset.val===chosen&&!ok) btn.classList.add('wrong');
+    });
+  } else {
+    const sel=document.querySelector('.mc-btn.selected');
+    const idx=sel?parseInt(sel.dataset.index):-1;
+    ok=idx===q.answer;
+    document.querySelectorAll('.mc-btn').forEach((btn,i)=>{
+      btn.disabled=true;
+      if(i===q.answer) btn.classList.add('correct');
+      else if(i===idx&&!ok) btn.classList.add('wrong');
+    });
+  }
+
+  lastAnswerOk=ok;
+  if(ok) score++;
+  refreshFeedback();
+  document.getElementById('check-btn').disabled=true;
+  document.getElementById('score-text').textContent=t(`점수: ${score}`,`Score: ${score}`);
+  if(current<totalCount-1){
+    document.getElementById('next-btn').style.display='block';
+    document.getElementById('next-btn').textContent=t('다음 문제 →','Next Question →');
+  } else {
+    setTimeout(()=>saveAndShowResult(),600);
+  }
+  playSound(ok);
+};
+
+function refreshFeedback(){
+  const q=questions[current];
+  const fb=document.getElementById('feedback-box');
+  fb.style.display='block';
+  fb.className=`feedback-box ${lastAnswerOk?'correct-fb':'wrong-fb'}`;
+  // 정답 오답 메시지
+  if(q.type==='ox'){
+    const ans=q.answer==='O'?t('"맞다" (O)','True (O)'):t('"틀리다" (X)','False (X)');
+    document.getElementById('feedback-result').textContent=lastAnswerOk
+      ?t('✅ 정답입니다!','✅ Correct!')
+      :t(`❌ 오답! 정답은 ${ans} 입니다.`,`❌ Wrong! The answer is ${ans}.`);
+  } else {
+    const opts=lang==='ko'?q.options_ko:q.options_en;
+    document.getElementById('feedback-result').textContent=lastAnswerOk
+      ?t('✅ 정답입니다!','✅ Correct!')
+      :t(`❌ 오답! 정답: ${String.fromCharCode(65+q.answer)}. ${opts[q.answer]}`,
+         `❌ Wrong! Answer: ${String.fromCharCode(65+q.answer)}. ${opts[q.answer]}`);
+  }
+  document.getElementById('feedback-explanation').textContent=`📖 ${lang==='ko'?q.exko:q.exen}`;
+  document.getElementById('check-btn').textContent=t('정답 확인','Check Answer');
+  document.getElementById('next-btn').textContent=t('다음 문제 →','Next Question →');
+
+  // 선택지 텍스트 재렌더(언어 전환 대응)
+  if(!answered) return;
+  if(q.type==='ox'){
+    document.querySelectorAll('.ox-btn').forEach(btn=>{
+      btn.innerHTML=`${btn.dataset.val}<span>${btn.dataset.val==='O'?t('맞다','True'):t('틀리다','False')}</span>`;
+    });
+  } else {
+    const opts=lang==='ko'?q.options_ko:q.options_en;
+    document.querySelectorAll('.mc-btn').forEach((btn,i)=>{
+      btn.innerHTML=`<span class="mc-btn-num">${String.fromCharCode(65+i)}</span>${opts[i]}`;
+    });
+  }
+}
+
+window.nextQuestion=function(){current++;loadQ();};
+
+// ── SOUND ─────────────────────────────────────────────────────────
+let audioCtx=null;
+let bgmNodes=[]; let bgmSessionId=0;
+
+function getACtx(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+document.addEventListener('touchstart',function ia(){getACtx();document.removeEventListener('touchstart',ia);},{once:true});
+document.addEventListener('click',function ia(){getACtx();document.removeEventListener('click',ia);},{once:true});
+
+function playSound(ok){
+  try{
+    const ctx=getACtx(); const t0=ctx.currentTime;
+    if(ok){
+      [[523,0],[659,0.13],[784,0.26],[1047,0.40]].forEach(([f,d])=>{
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);o.type='sine';
+        o.frequency.setValueAtTime(f,t0+d);
+        g.gain.setValueAtTime(0,t0+d);g.gain.linearRampToValueAtTime(0.15,t0+d+0.04);g.gain.exponentialRampToValueAtTime(0.001,t0+d+0.22);
+        o.start(t0+d);o.stop(t0+d+0.23);
+      });
+    } else {
+      [[330,0,0.30],[262,0.35,0.30],[220,0.70,0.45]].forEach(([f,d,dur])=>{
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);o.type='sine';
+        o.frequency.setValueAtTime(f,t0+d);o.frequency.linearRampToValueAtTime(f*0.82,t0+d+dur);
+        g.gain.setValueAtTime(0,t0+d);g.gain.linearRampToValueAtTime(0.14,t0+d+0.04);g.gain.exponentialRampToValueAtTime(0.001,t0+d+dur+0.05);
+        o.start(t0+d);o.stop(t0+d+dur+0.06);
+      });
+    }
+  }catch(e){}
+}
+
+function stopBgm(){bgmSessionId++;bgmNodes.forEach(n=>{try{n.stop();}catch(e){}});bgmNodes=[];}
+
+function playBgm(){
+  stopBgm(); const myS=++bgmSessionId;
+  try{
+    const ctx=getACtx();
+    const mel=[[523,0,0.28],[659,0.33,0.28],[784,0.66,0.28],[880,1.0,0.42],[784,1.5,0.20],[659,1.75,0.20],[784,2.0,0.55],[698,2.66,0.28],[784,3.0,0.28],[880,3.33,0.28],[1047,3.66,0.42],[880,4.16,0.20],[784,4.41,0.20],[880,4.66,0.55],[784,5.33,0.20],[698,5.55,0.20],[659,5.77,0.20],[523,6.0,0.55],[659,6.66,0.20],[523,6.88,0.20],[440,7.10,0.20],[523,7.33,0.55]];
+    const bas=[[262,0,0.22],[196,0.33,0.22],[196,0.66,0.22],[262,1.0,0.22],[196,1.5,0.22],[196,2.0,0.22],[349,2.66,0.22],[262,3.0,0.22],[262,3.33,0.22],[349,3.66,0.22],[262,4.16,0.22],[262,4.66,0.22],[392,5.33,0.22],[294,5.77,0.22],[262,6.0,0.22],[330,6.66,0.22],[262,7.10,0.22],[262,7.33,0.22]];
+    const loop=8.0;
+    function sched(){
+      if(bgmSessionId!==myS)return;
+      const t0=ctx.currentTime+0.05;
+      [...mel].forEach(([f,w,d])=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='triangle';o.frequency.setValueAtTime(f,t0+w);g.gain.setValueAtTime(0,t0+w);g.gain.linearRampToValueAtTime(0.07,t0+w+0.03);g.gain.exponentialRampToValueAtTime(0.001,t0+w+d);o.start(t0+w);o.stop(t0+w+d+0.01);bgmNodes.push(o);});
+      [...bas].forEach(([f,w,d])=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.setValueAtTime(f,t0+w);g.gain.setValueAtTime(0,t0+w);g.gain.linearRampToValueAtTime(0.05,t0+w+0.04);g.gain.exponentialRampToValueAtTime(0.001,t0+w+d);o.start(t0+w);o.stop(t0+w+d+0.01);bgmNodes.push(o);});
+      setTimeout(()=>{if(bgmSessionId===myS)sched();},(loop-0.3)*1000);
+    }
+    sched();
+  }catch(e){}
+}
+
+// ── EMAIL & EXCEL EXPORT ───────────────────────────────────────────
+const EMAILJS_PUBLIC_KEY='jPt14lizlL33u8-2T';
+const EMAILJS_SERVICE_ID='service_h6a0do9';
+const EMAILJS_TEMPLATE_ID='template_yl5g06g';
+const RECIPIENT_EMAIL='DM@samil-pharm.com';
+
+// EmailJS 초기화
+try{ emailjs.init({publicKey:EMAILJS_PUBLIC_KEY}); }catch(e){console.warn('EmailJS init failed',e);}
+
+async function sendResultEmail(){
+  const statusEl=document.getElementById('email-status');
+  if(!window.emailjs){
+    statusEl.textContent=t('이메일 라이브러리 로드 실패','Email library failed to load');
+    statusEl.className='email-status error';
+    return;
+  }
+  const pct=Math.round((score/totalCount)*100);
+  let grade;
+  if(pct>=90) grade=t('GMP 마스터','GMP Master');
+  else if(pct>=70) grade=t('우수 수료','Excellent');
+  else if(pct>=50) grade=t('기본기 양호','Good Foundation');
+  else grade=t('재교육 필요','Retraining Needed');
+
+  const now=new Date();
+  const datetime=now.toLocaleString(lang==='ko'?'ko-KR':'en-US');
+
+  // 이메일 본문 (한/영)
+  const messageKo=`안녕하세요,
+
+아래는 GMP Quiz 결과입니다.
+
+▣ 참여자: ${playerName}
+▣ 점수: ${score} / ${totalCount}
+▣ 정답률: ${pct}%
+▣ 등급: ${grade}
+▣ 응시 일시: ${datetime}
+
+본 메일은 자동 발송되었습니다.
+GMP Training System`;
+
+  const messageEn=`Hello,
+
+Below are the GMP Quiz results.
+
+▣ Participant: ${playerName}
+▣ Score: ${score} / ${totalCount}
+▣ Percentage: ${pct}%
+▣ Grade: ${grade}
+▣ Date: ${datetime}
+
+This email was sent automatically.
+GMP Training System`;
+
+  const subjectKo=`[Annex 11 Quiz] ${playerName} 님의 퀴즈 결과`;
+  const subjectEn=`[Annex 11 Quiz] ${playerName}'s Quiz Result`;
+
+  const params={
+    to_email: RECIPIENT_EMAIL,
+    participant_name: playerName,
+    score: String(score),
+    total: String(totalCount),
+    percentage: String(pct),
+    grade: grade,
+    datetime: datetime,
+    subject: lang==='ko'?subjectKo:subjectEn,
+    message: lang==='ko'?messageKo:messageEn
+  };
+
+  statusEl.textContent=t('📨 이메일 전송 중...','📨 Sending email...');
+  statusEl.className='email-status';
+  try{
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    statusEl.textContent=t('✅ 결과가 이메일로 전송되었습니다','✅ Results sent via email');
+    statusEl.className='email-status success';
+  }catch(err){
+    console.error('EmailJS error:',err);
+    statusEl.textContent=t('⚠️ 이메일 전송 실패 (관리자에게 문의)','⚠️ Email failed (contact admin)');
+    statusEl.className='email-status error';
+  }
+}
+
+// 전체 점수 데이터를 가져와 XLSX로 다운로드
+window.downloadXlsx=async function(){
+  if(typeof XLSX==='undefined'){
+    alert(t('엑셀 라이브러리 로드 실패','Excel library failed to load'));
+    return;
+  }
+  const btn1=document.getElementById('result-download-btn');
+  const btn2=document.getElementById('hof-download-btn');
+  [btn1,btn2].forEach(b=>{if(b){b.disabled=true;}});
+  const lblKo='⏳ 다운로드 중...';
+  const lblEn='⏳ Downloading...';
+  document.getElementById('download-btn-label').textContent=t(lblKo,lblEn);
+  document.getElementById('hof-download-btn-label').textContent=t(lblKo,lblEn);
+
+  try{
+    // Firebase에서 전체 데이터 가져오기 (점수 내림차순)
+    const q2=query(collection(db,'annex11_scores'),orderBy('score','desc'));
+    const snap=await getDocs(q2);
+    const rows=[];
+    snap.forEach(doc=>{
+      const d=doc.data();
+      let dt='';
+      if(d.timestamp&&d.timestamp.toDate){
+        dt=d.timestamp.toDate().toLocaleString(lang==='ko'?'ko-KR':'en-US');
+      }
+      const pct=d.total?Math.round((d.score/d.total)*100):0;
+      rows.push({
+        rank: rows.length+1,
+        name: d.name||'',
+        score: d.score||0,
+        total: d.total||0,
+        percentage: pct,
+        datetime: dt
+      });
+    });
+
+    if(!rows.length){
+      alert(t('저장된 기록이 없습니다','No records found'));
+      return;
+    }
+
+    // 헤더 (언어에 따라)
+    const headers=lang==='ko'
+      ? [['순위','이름','점수','총문제','정답률(%)','응시 일시']]
+      : [['Rank','Name','Score','Total','Percentage(%)','Date']];
+    const dataMatrix=rows.map(r=>[r.rank,r.name,r.score,r.total,r.percentage,r.datetime]);
+    const finalData=[...headers,...dataMatrix];
+
+    const ws=XLSX.utils.aoa_to_sheet(finalData);
+    // 컬럼 너비
+    ws['!cols']=[{wch:6},{wch:18},{wch:8},{wch:8},{wch:12},{wch:22}];
+
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, lang==='ko'?'GMP 퀴즈 결과':'GMP Quiz Results');
+
+    const today=new Date().toISOString().slice(0,10);
+    const fname=`Annex11_Quiz_Results_${today}.xlsx`;
+    XLSX.writeFile(wb, fname);
+  }catch(err){
+    console.error('XLSX export error:',err);
+    alert(t('엑셀 다운로드 실패: '+err.message,'Excel download failed: '+err.message));
+  }finally{
+    [btn1,btn2].forEach(b=>{if(b){b.disabled=false;}});
+    document.getElementById('download-btn-label').textContent=t('전체 결과 엑셀 다운로드','Download All Results (XLSX)');
+    document.getElementById('hof-download-btn-label').textContent=t('전체 결과 엑셀 다운로드','Download All Results (XLSX)');
+  }
+};
+
+// ── SAVE & RESULT ──────────────────────────────────────────────────
+async function saveAndShowResult(){
+  document.getElementById('saving-overlay').classList.add('show');
+  try{await addDoc(collection(db,'annex11_scores'),{name:playerName,score,total:totalCount,timestamp:serverTimestamp()});}
+  catch(e){console.error(e);}
+  document.getElementById('saving-overlay').classList.remove('show');
+  await showResult();
+  // 결과 표시 후 이메일 전송 (백그라운드)
+  sendResultEmail();
+}
+
+async function showResult(){
+  showScreen('screen-result');
+  playBgm();
+  document.getElementById('email-status').textContent='';
+  document.getElementById('email-status').className='email-status';
+  const pct=score/totalCount;
+  let emoji,tko,ten,mko,men;
+  if(pct>=0.9){emoji='🏆';tko='GMP 마스터!';ten='GMP Master!';mko='"탁월한 GMP 이해도입니다! 현장의 든든한 수호자네요. 🌟"';men='"Outstanding GMP knowledge! You are a true guardian of the production floor. 🌟"';}
+  else if(pct>=0.7){emoji='⭐';tko='우수 수료!';ten='Excellent!';mko='"훌륭한 점수입니다! 조금 더 다듬으면 완벽해질 거예요. 💪"';men='"Great score! A little more practice and you\'ll be perfect. 💪"';}
+  else if(pct>=0.5){emoji='📋';tko='기본기 양호';ten='Good Foundation';mko='"기본기는 갖추었습니다. 취약 영역을 복습해 보세요. 📚"';men='"Solid foundation. Please review your weak areas. 📚"';}
+  else{emoji='📖';tko='재교육 필요';ten='Retraining Needed';mko='"GMP 교육 자료를 다시 한번 복습하고 재도전해 보세요! 🔄"';men='"Please review the GMP training materials and try again! 🔄"';}
+
+  document.getElementById('result-emoji').textContent=emoji;
+  document.getElementById('result-title').textContent=t(tko,ten);
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('final-total').textContent=t(`/ ${totalCount} 점`,`/ ${totalCount} pts`);
+  document.getElementById('stat-correct').textContent=score;
+  document.getElementById('stat-wrong').textContent=totalCount-score;
+  document.getElementById('result-msg').textContent=t(mko,men);
+
+  const list=document.getElementById('top10-list');
+  list.innerHTML='<div class="hof-loading">⏳</div>';
+  try{
+    const q2=query(collection(db,'annex11_scores'),orderBy('score','desc'),limit(10));
+    const snap=await getDocs(q2);
+    const rows=[];snap.forEach(doc=>rows.push(doc.data()));
+    if(!rows.length){list.innerHTML=`<div class="hof-empty">${t('아직 기록이 없어요 🎯','No records yet 🎯')}</div>`;return;}
+    list.innerHTML='';
+    const medals=['🥇','🥈','🥉'];
+    rows.forEach((r,i)=>{
+      const isMe=r.name===playerName&&r.score===score;
+      const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+      const div=document.createElement('div');div.className=`rank-row${isMe?' me':''}`;
+      div.innerHTML=`<span class="rank-num ${rc}">${i<3?medals[i]:i+1}</span><span class="rank-name">${r.name}${isMe?t(' (나)',' (Me)'):''}</span><span class="rank-score">${r.score}${t('점','pts')}</span>`;
+      list.appendChild(div);
+    });
+  }catch(e){list.innerHTML=`<div class="hof-empty">${t('랭킹을 불러올 수 없어요','Could not load ranking')}</div>`;}
+}
+
+function refreshResultLang(){
+  const pct=score/totalCount;
+  let tko,ten,mko,men;
+  if(pct>=0.9){tko='GMP 마스터!';ten='GMP Master!';mko='"탁월한 GMP 이해도입니다! 현장의 든든한 수호자네요. 🌟"';men='"Outstanding GMP knowledge! You are a true guardian of the production floor. 🌟"';}
+  else if(pct>=0.7){tko='우수 수료!';ten='Excellent!';mko='"훌륭한 점수입니다! 조금 더 다듬으면 완벽해질 거예요. 💪"';men='"Great score! A little more practice and you\'ll be perfect. 💪"';}
+  else if(pct>=0.5){tko='기본기 양호';ten='Good Foundation';mko='"기본기는 갖추었습니다. 취약 영역을 복습해 보세요. 📚"';men='"Solid foundation. Please review your weak areas. 📚"';}
+  else{tko='재교육 필요';ten='Retraining Needed';mko='"GMP 교육 자료를 다시 한번 복습하고 재도전해 보세요! 🔄"';men='"Please review the GMP training materials and try again! 🔄"';}
+  document.getElementById('result-title').textContent=t(tko,ten);
+  document.getElementById('result-msg').textContent=t(mko,men);
+  document.getElementById('final-total').textContent=t(`/ ${totalCount} 점`,`/ ${totalCount} pts`);
+  document.getElementById('lbl-correct').textContent=t('정답','Correct');
+  document.getElementById('lbl-wrong').textContent=t('오답','Wrong');
+  document.getElementById('top10-title').textContent=t('🏅 TOP 10 랭킹','🏅 TOP 10 RANKING');
+  document.getElementById('retry-btn').textContent=t('다시 도전하기 →','Try Again →');
+  document.querySelectorAll('.rank-row').forEach(row=>{
+    const ne=row.querySelector('.rank-name');const se=row.querySelector('.rank-score');
+    if(ne){ne.textContent=ne.textContent.replace(' (나)','').replace(' (Me)','');if(row.classList.contains('me'))ne.textContent+=t(' (나)',' (Me)');}
+    if(se){const n=parseInt(se.textContent);if(!isNaN(n))se.textContent=`${n}${t('점','pts')}`;}
+  });
+}
+
+// ── HALL OF FAME ───────────────────────────────────────────────────
+function renderHofTable(){
+  const content=document.getElementById('hof-content');
+  if(!hofRows.length){content.innerHTML=`<div class="hof-empty">${t('아직 기록이 없어요.<br>퀴즈를 완료하면 이름이 올라와요! 🎯','No records yet.<br>Complete a quiz to appear here! 🎯')}</div>`;return;}
+  const medals=['🥇','🥈','🥉'];
+  let html=`<table class="hof-table"><thead><tr><th>${t('순위','Rank')}</th><th>${t('이름','Name')}</th><th>${t('점수','Score')}</th></tr></thead><tbody>`;
+  hofRows.forEach((r,i)=>{html+=`<tr><td class="hof-rank-cell">${i<3?medals[i]:i+1}</td><td>${r.name}</td><td>${r.score}${t('점','pts')}</td></tr>`;});
+  html+='</tbody></table>';content.innerHTML=html;
+}
+
+window.showHallOfFame=async function(){
+  prevScreen=document.querySelector('.screen.active')?.id||'screen-start';
+  showScreen('screen-hof');
+  stopBgm();
+  setLang(lang);
+  const content=document.getElementById('hof-content');content.innerHTML='<div class="hof-loading">⏳</div>';
+  try{
+    const q2=query(collection(db,'annex11_scores'),orderBy('score','desc'),limit(20));
+    const snap=await getDocs(q2);
+    hofRows=[];snap.forEach(doc=>hofRows.push(doc.data()));
+    renderHofTable();
+  }catch(e){content.innerHTML=`<div class="hof-empty">${t('데이터를 불러올 수 없어요','Could not load data')}</div>`;}
+};
+
+window.goBack=function(){
+  stopBgm();
+  showScreen(prevScreen);
+  if(prevScreen==='screen-result') playBgm();
+};
+
+window.resetQuiz=function(){
+  stopBgm();
+  totalCount=30;questions=[];current=0;score=0;answered=false;
+  document.getElementById('start-btn').disabled=true;
+  showScreen('screen-start');
+  setLang(lang);
+};
+
+// init
+setLang('ko');
+document.addEventListener('touchstart',function startB(){playBgm();document.removeEventListener('touchstart',startB);},{once:true});
+document.addEventListener('click',function startB(){playBgm();document.removeEventListener('click',startB);},{once:true});
+window.startQuiz=function(){questions=buildQuestions(totalCount);current=0;score=0;stopBgm();showScreen('screen-quiz');loadQ();};
+</script>
+</body>
+</html>
